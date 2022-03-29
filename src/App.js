@@ -1,23 +1,49 @@
-import logo from './logo.svg';
-import './App.css';
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import Coins from "./components/Coins";
+import Navbar from "./components/Navbar";
+import {BsSearch} from 'react-icons/bs'
+import './App.css'
 
 function App() {
+  const [coins, setCoins] = useState([])
+  const [search, setSearch] = useState('')
+  
+  useEffect(() => {
+    axios.get('https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&order=market_cap_desc&per_page=50&page=1&sparkline=false')
+    .then((response) => {
+      setCoins(response.data)
+      console.log(response.data)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }, [])
+
+  const handleChange = e => {
+    // console.log(e.target.value)
+    setSearch(e.target.value)
+  }
+
+  const filteredCoins = coins.filter((coin) => (
+    coin.name.toLowerCase().includes(search.toLowerCase())
+  ))
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Navbar />
+      <div className="search-bar">
+        <form >
+          <BsSearch className="logo" />
+          <input 
+            type='text' 
+            placeholder="Search" 
+            className="coin_input" 
+            onChange={handleChange} />
+        </form>
+      </div>
+      <Coins coins={filteredCoins} /> 
     </div>
   );
 }
